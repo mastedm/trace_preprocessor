@@ -19,8 +19,9 @@ REGEXPS
 %%
 LEX
     
-      template.gsub!("COMMON_CODE", dsl.code)
-      template.gsub!("CONVERTER_FUNCTIONS", dsl._converter_functions_c_code)
+      template.gsub!("COMMON_CODE",         dsl.code)
+      template.gsub!("CONVERTER_FUNCTIONS", converter_functions_c_code(dsl))
+      template.gsub!("REGEXPS",             regexps(dsl))
     
       template
     end
@@ -37,22 +38,34 @@ LEX
       result      
     end
     
-    def output_token_code dsl
+    def self.regexps dsl
+      result = ""
+
+      dsl.lexemes.each do |name, lexeme|
+        if lexeme.regexp
+          result += "#{lexeme.regexp.source} parse_#{name}();\n"
+        end
+      end
+      
+      result
+    end
+    
+    def self.output_token_code dsl
 <<-CODE
-void output_token(const char* name, const char* source, long value) {
+void output_token(const char* name, const char* source, long value, int value_kind) {
     #{dsl.output_token_code}
 }  
 CODE
     end
     
-    def parse_lexeme_code(name, lexeme)
+    def self.parse_lexeme_code(name, lexeme)
 <<-CODE
 long converter_#{name}() {
     #{lexeme.converter[:c]}
 }
 
 void parse_#{name}() {
-    output_token("#{name}", yytext, converter_#{name}());
+    output_token("#{name}", yytext, converter_#{name}(), #{lexeme.value_kind == :exact ? 1 : 0});
 }
 CODE
     end

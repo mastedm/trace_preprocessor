@@ -1,0 +1,56 @@
+%w(
+  lexeme
+).each do |file| 
+  require File.join(File.dirname(__FILE__), file) 
+end
+
+require 'fileutils'
+
+module TracePreprocessor
+  class DSL
+    def initialize
+      @lexemes = {}
+      @code = ""
+    end
+    
+    def init &block
+      instance_eval &block
+    end
+    
+    def define_lexeme name, options
+      lexeme = @lexemes[name] || Lexeme.new(name)
+
+      lexeme.regexp      = options[:regexp]
+      lexeme.value_kind  = options[:value_kind] || :hash
+      
+      converter = options[:converter]
+      converter_language = :c
+      converter_language = :ruby if converter.instance_of? Proc
+      lexeme.converter[converter_language] = converter
+      
+      @lexemes[lexeme.name] = lexeme
+      
+      lexeme
+    end
+    
+    def common_code code
+      @code += code
+    end
+    
+    def output_token code
+      @output_token_code = code
+    end
+    
+    def workspace path
+      @workspace_path = File.expand_path path
+      
+      if not File.exist? @workspace_path
+        FileUtils.mkdir_p @workspace_path
+      end
+    end
+    
+    attr_accessor :lexemes
+    attr_accessor :code, :output_token_code
+    attr_accessor :workspace_path
+  end
+end
