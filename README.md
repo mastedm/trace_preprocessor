@@ -18,7 +18,7 @@ Or install it yourself as:
 
 ## Usage
 
-#!/usr/bin/env ruby
+    #!/usr/bin/env ruby
 
 	require 'trace_preprocessor'
 
