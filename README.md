@@ -1,6 +1,6 @@
 # TracePreprocessor
 
-TODO: Write a gem description
+Simple trace preprocess based on lexical analyzer
 
 ## Installation
 
@@ -18,12 +18,27 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+#!/usr/bin/env ruby
 
-## Contributing
+	require 'trace_preprocessor'
 
-1. Fork it
-2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Commit your changes (`git commit -am 'Add some feature'`)
-4. Push to the branch (`git push origin my-new-feature`)
-5. Create new Pull Request
+	# Configuration
+	config = TracePreprocessor.init do
+	  define_lexeme :id,
+	    :regexp     => /[0-9]+/,
+	    :converter  => "return atol(yytext);",
+	    :value_kind => :exact,
+	    :priority   => 1
+
+	  output_token "printf(\"{TOKEN;%s;%s;%ld;%d}\", name, source, value, value_kind);"
+
+	  workspace "~/.trace_preprocessor"
+	end
+
+	# Generate preprocessor
+	preprocessor = TracePreprocessor.generate(config, :c)
+
+	# Preprocessor run
+	preprocessor.run("input.txt", "output.txt")
+
+
