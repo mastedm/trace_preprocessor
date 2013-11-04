@@ -18,10 +18,7 @@ module TracePreprocessor
     end
     
     def define_lexeme name, options
-      lexeme = @lexemes[name] || Lexeme.new(name)
-
-      lexeme.regexp      = options[:regexp]
-      lexeme.value_kind  = options[:value_kind] || :hash
+      lexeme = @lexemes[name] || Lexeme.new(name, options)
       
       converter = options[:converter]
       converter_language = :c

@@ -41,9 +41,12 @@ LEX
     def self.regexps dsl
       result = ""
 
-      dsl.lexemes.each do |name, lexeme|
+      a = dsl.lexemes.values
+      a.sort! { |x, y| x.priority <=> y.priority }
+
+      a.each do |lexeme|
         if lexeme.regexp
-          result += "#{lexeme.regexp.source} parse_#{name}();\n"
+          result += "#{lexeme.regexp.source} parse_#{lexeme.name}();\n"
         end
       end
       
