@@ -57,7 +57,8 @@ LEX
 <<-CODE
 void output_token(const char* name, const char* source, long value, int value_kind) {
     #{dsl.output_token_code}
-}  
+}
+  
 CODE
     end
     
@@ -70,6 +71,7 @@ long converter_#{name}() {
 void parse_#{name}() {
     output_token("#{name}", yytext, converter_#{name}(), #{lexeme.value_kind == :exact ? 1 : 0});
 }
+
 CODE
     end
     

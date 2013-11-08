@@ -30,6 +30,11 @@ module TracePreprocessor
       lexeme
     end
     
+    def use_default_lexemes
+      default_lexemes_file_name = File.join(File.dirname(__FILE__), "default_lexemes.rb")
+      eval open(default_lexemes_file_name, "r") { |fd| fd.read }
+    end
+    
     def common_code code
       @code += code
     end

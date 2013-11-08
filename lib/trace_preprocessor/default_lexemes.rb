@@ -1,5 +1,9 @@
 # Defalt lexemes
 
+common_code <<-CODE
+#include <time.h>
+CODE
+
 define_lexeme :ip,
   :regexp => /(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)/,
   :value_kind => :exact,
@@ -10,7 +14,7 @@ define_lexeme :ip,
   CODE
 
 define_lexeme :uuid,
-  :regexp => /[0-9]{2}\ [a-zA-Z]{3}\ [0-9]{4}\ [0-9]{2}\:[0-9]{2}\:[0-9]{2}/,
+  :regexp => /[A-Fa-f0-9]{8}-(?:[A-Fa-f0-9]{4}-){3}[A-Fa-f0-9]{12}/,
   :value_kind => :hash,
   :converter => <<-CODE
     long x[5];
@@ -18,4 +22,14 @@ define_lexeme :uuid,
     return ((((x[0] << 16) | x[1]) << 16) | x[2]) ^ ((x[3] << 48) | x[4]);
   CODE
   
-  
+define_lexeme :date,
+  :regexp => /[0-9]{2}\ (?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)\ [0-9]{4}\ [0-9]{2}:[0-9]{2}:[0-9]{2}/,
+  :value_kind => :exact,
+  :converter => <<-CODE
+    struct tm tm;
+    time_t t;
+    
+    if (strptime(yytext, "[%d %b %Y %H:%M:%S]", &tm) == NULL) /* handle error */ ;
+      
+    return mktime(&tm);
+  CODE
