@@ -11,6 +11,8 @@ module TracePreprocessor
     def initialize
       @lexemes = {}
       @code = ""
+      
+      workspace "~/.trace_preprocessor"
     end
     
     def init &block
