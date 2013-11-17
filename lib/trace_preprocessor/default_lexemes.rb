@@ -29,7 +29,7 @@ define_lexeme :date,
     struct tm tm;
     time_t t;
     
-    if (strptime(yytext, "[%d %b %Y %H:%M:%S]", &tm) == NULL) /* handle error */ ;
+    if (strptime(yytext, "%d %b %Y %H:%M:%S", &tm) == NULL) return -1;
       
     return mktime(&tm);
   CODE
